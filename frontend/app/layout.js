@@ -1,5 +1,8 @@
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { QueryProvider } from '@/providers/queryProvider';
+import AuthGate from '@/components/AuthGate';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -22,7 +25,15 @@ export default function RootLayout({ children }) {
             lang="en"
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
-            <body className="min-h-full flex flex-col">{children}</body>
+            <body className="min-h-full flex flex-col">
+                <QueryProvider>
+                    <GoogleOAuthProvider
+                        clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
+                    >
+                        <AuthGate>{children}</AuthGate>
+                    </GoogleOAuthProvider>
+                </QueryProvider>
+            </body>
         </html>
     );
 }
