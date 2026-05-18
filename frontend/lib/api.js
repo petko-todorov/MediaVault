@@ -1,11 +1,9 @@
-export async function loginWithGoogle(id_token) {
+export async function loginWithGoogle(code) {
     const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google/`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google/callback/?code=${code}`,
         {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            method: 'GET',
             credentials: 'include',
-            body: JSON.stringify({ id_token }),
         },
     );
 
@@ -14,8 +12,16 @@ export async function loginWithGoogle(id_token) {
 }
 
 export async function logout() {
-    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout/`, {
+    await fetch('/api/auth/logout', {
         method: 'POST',
-        credentials: 'include',
     });
+
+    try {
+        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout/`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+    } catch (error) {
+        console.error('Backend logout failed:', error);
+    }
 }
