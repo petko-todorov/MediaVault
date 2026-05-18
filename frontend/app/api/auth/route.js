@@ -13,6 +13,14 @@ export const GET = requireAuth(async (_, { accessToken }) => {
 
         return NextResponse.json({ user: response.data }, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const response = NextResponse.json(
+            { error: 'Unauthorized' },
+            { status: 401 },
+        );
+
+        response.cookies.delete('access_token');
+        response.cookies.delete('refresh_token');
+
+        return response;
     }
 });
