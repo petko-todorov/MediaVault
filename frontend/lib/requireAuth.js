@@ -1,5 +1,4 @@
-import {  NextResponse } from 'next/server';
-
+import { NextResponse } from 'next/server';
 import axios from 'axios';
 
 export function requireAuth(handler) {
@@ -12,9 +11,13 @@ export function requireAuth(handler) {
         }
 
         if (!refreshToken) {
+            // return NextResponse.json(
+            //     { error: 'Unauthorized' },
+            //     { status: 401 },
+            // );
             return NextResponse.json(
-                { error: 'Unauthorized' },
-                { status: 401 },
+                { user: null, authenticated: false },
+                { status: 200 },
             );
         }
 
@@ -22,16 +25,21 @@ export function requireAuth(handler) {
         let newRefreshToken = null;
         try {
             const response = await axios.post(
-                `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/refresh/`,
+                `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/refresh/`,
                 { refresh: refreshToken },
             );
             newAccessToken = response.data.access;
             newRefreshToken = response.data.refresh;
         } catch (error) {
-            return NextResponse.json(
+            const response = NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 },
             );
+
+            response.cookies.delete('access_token');
+            response.cookies.delete('refresh_token');
+
+            return response;
         }
 
         const response = await handler(req, {
