@@ -1,9 +1,18 @@
 'use client';
 
 import { useAuth } from '@/hooks/useAuth';
+import { useStore } from '@/store/useStore';
+import { useEffect } from 'react';
 
 export default function AuthGate({ children }) {
-    const { isLoading } = useAuth();
+    const { data, isLoading } = useAuth();
+    const setUser = useStore((state) => state.setUser);
+
+    useEffect(() => {
+        if (data && data.user) {
+            setUser(data.user);
+        }
+    }, [data, setUser]);
 
     if (isLoading) {
         return (
