@@ -10,8 +10,19 @@ export const GET = requireAuth(async (_, { accessToken }) => {
                 headers: { Authorization: `Bearer ${accessToken}` },
             },
         );
+        const nextResponse = NextResponse.json(
+            { user: response.data },
+            { status: 200 },
+        );
 
-        return NextResponse.json({ user: response.data }, { status: 200 });
+        const djangoCookie = response.headers.get('set-cookie');
+        if (djangoCookie) {
+            djangoCookie.forEach((cookie) => {
+                nextResponse.headers.append('Set-Cookie', cookie);
+            });
+        }
+
+        return nextResponse;
     } catch (error) {
         const response = NextResponse.json(
             { error: 'Unauthorized' },
@@ -20,6 +31,7 @@ export const GET = requireAuth(async (_, { accessToken }) => {
 
         response.cookies.delete('access_token');
         response.cookies.delete('refresh_token');
+        response.cookies.delete('csrftoken');
 
         return response;
     }
