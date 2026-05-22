@@ -3,6 +3,8 @@ import './globals.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { QueryProvider } from '@/providers/queryProvider';
 import AuthGate from '@/components/AuthGate';
+import SideNavBar from '@/components/SideNavBar';
+import Header from '@/components/Header';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -30,7 +32,17 @@ export default function RootLayout({ children }) {
                     <GoogleOAuthProvider
                         clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
                     >
-                        <AuthGate>{children}</AuthGate>
+                        <AuthGate>
+                            <div className="flex h-screen w-screen overflow-hidden scrollbar-thumb-sky-900">
+                                <SideNavBar />
+
+                                <div className="flex-1 h-full overflow-y-auto relative">
+                                    <Header />
+
+                                    <main className="p-6">{children}</main>
+                                </div>
+                            </div>
+                        </AuthGate>
                     </GoogleOAuthProvider>
                 </QueryProvider>
             </body>
