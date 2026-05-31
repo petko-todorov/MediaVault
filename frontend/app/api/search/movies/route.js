@@ -1,0 +1,22 @@
+import axios from 'axios';
+import { requireAuth } from '@/lib/requireAuth';
+import { NextResponse } from 'next/server';
+
+export const POST = requireAuth(async (request, { accessToken }) => {
+    const body = await request.json();
+    try {
+        const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/search-movies-series/`,
+            {
+                headers: { Authorization: `Bearer ${accessToken}` },
+                params: { q: body.q },
+            },
+        );
+        return NextResponse.json(res.data, { status: 200 });
+    } catch (error) {
+        return NextResponse.json(
+            { error: 'Failed to fetch movies and series' },
+            { status: error.response?.status || 500 },
+        );
+    }
+});
