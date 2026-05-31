@@ -6,7 +6,7 @@ export const POST = requireAuth(async (request, { accessToken }) => {
     const body = await request.json();
     try {
         const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/games/`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/search-games/`,
             {
                 headers: { Authorization: `Bearer ${accessToken}` },
                 params: { q: body.q },
