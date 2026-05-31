@@ -1,33 +1,39 @@
 import axios from 'axios';
 
-axios.defaults.withCredentials = true;
-axios.defaults.xsrfCookieName = 'csrftoken';
-axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-
 export async function loginWithGoogle(code) {
-    const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google/callback/?code=${code}`,
-        {
-            method: 'GET',
-            credentials: 'include',
-        },
-    );
-
-    if (!response.ok) throw new Error('Login failed');
-    return response.json();
+    try {
+        const response = await axios.get(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/google/callback/`,
+            {
+                params: { code },
+                withCredentials: true,
+            },
+        );
+        return response.data;
+    } catch (error) {
+        console.error(
+            'Google login failed:',
+            error.response?.data || error.message,
+        );
+        throw error;
+    }
 }
 
 export async function logout() {
-    await fetch('/api/auth/logout', {
-        method: 'POST',
-    });
-
     try {
-        await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout/`, {
-            method: 'POST',
-            credentials: 'include',
-        });
+        await axios.post('/api/auth/logout');
+
+        await axios.post(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout/`,
+            {},
+            {
+                withCredentials: true,
+            },
+        );
     } catch (error) {
-        console.error('Backend logout failed:', error);
+        console.error(
+            'Logout failed:',
+            error.response?.data || error.message,
+        );
     }
 }
