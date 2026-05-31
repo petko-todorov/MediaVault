@@ -24,15 +24,11 @@ export const GET = requireAuth(async (_, { accessToken }) => {
 
         return nextResponse;
     } catch (error) {
-        const response = NextResponse.json(
-            { error: 'Unauthorized' },
-            { status: 401 },
+        console.error('Auth check failed:', error.response?.data || error.message);
+        
+        return NextResponse.json(
+            { error: error.response?.status === 401 ? 'Unauthorized' : 'Internal server error' },
+            { status: error.response?.status || 500 },
         );
-
-        response.cookies.delete('access_token');
-        response.cookies.delete('refresh_token');
-        response.cookies.delete('csrftoken');
-
-        return response;
     }
 });
