@@ -15,7 +15,7 @@ const LINKS = [
     },
     {
         name: 'Library',
-        href: '#',
+        href: '/library',
         icon: <MdVideoLibrary className="text-indigo-200" size={25} />,
     },
     {
@@ -29,7 +29,9 @@ export default function SideNavBar() {
     const pathname = usePathname();
     const user = useStore((state) => state.user);
 
-    if (pathname === '/welcome' || !user) {
+    const isWelcomePage = pathname === '/welcome' || pathname === '/welcome/';
+
+    if (isWelcomePage || !user) {
         return null;
     }
 
@@ -48,18 +50,18 @@ export default function SideNavBar() {
                     const isActive = link.href === pathname;
 
                     return (
-                        <div
+                        <Link
                             key={index}
-                            className={`flex justify-start items-center space-x-2 rounded-xl px-4 py-3 ${isActive ? 'bg-slate-700' : ''}`}
+                            href={link.href}
+                            className={`flex justify-start items-center space-x-3 rounded-xl px-4 py-3 transition-colors ${
+                                isActive
+                                    ? 'bg-slate-700 text-white'
+                                    : 'hover:bg-slate-800 text-gray-300'
+                            }`}
                         >
                             {link.icon}
-                            <Link
-                                className={` ${isActive ? '' : ''}`}
-                                href={link.href}
-                            >
-                                {link.name}
-                            </Link>
-                        </div>
+                            <span className="font-medium">{link.name}</span>
+                        </Link>
                     );
                 })}
             </nav>
