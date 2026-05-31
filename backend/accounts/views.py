@@ -1,9 +1,11 @@
+import os
+
 import requests
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.http import JsonResponse, HttpResponseRedirect
 from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from rest_framework.generics import RetrieveAPIView
@@ -14,7 +16,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.serializers import UserMeSerializer
 
+User = get_user_model()
 
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class GoogleCallbackView(APIView):
     permission_classes = [AllowAny]
 
@@ -55,21 +60,25 @@ class GoogleCallbackView(APIView):
             return HttpResponseRedirect(f"{settings.FRONTEND_URL}")
 
         email = id_info["email"]
-        name = id_info.get("name", "")
+        first_name = id_info.get("given_name", "")
+        last_name = id_info.get("family_name", "")
 
-        # TODO: change based on id_info
         user, created = User.objects.get_or_create(
-            email=email,
-            defaults={"username": email, "first_name": name},
+            username=email,
+            defaults={
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+            }
         )
 
         refresh = RefreshToken.for_user(user)
 
-        response = HttpResponseRedirect("http://localhost:3000/")
+        response = HttpResponseRedirect(settings.FRONTEND_URL)
 
-        is_secure = not settings.DEBUG
+        # TODO: make SESSION_COOKIE_SECURE True on deploy
+        is_secure = os.getenv('SESSION_COOKIE_SECURE') == 'True'
 
-        print('refresh', refresh)
         response.set_cookie(
             "access_token",
             str(refresh.access_token),
@@ -94,14 +103,15 @@ class GoogleCallbackView(APIView):
         return response
 
 
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class UserMeView(RetrieveAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = UserMeSerializer
 
     def get_object(self):
         return self.request.user
 
 
-@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -117,4 +127,5 @@ class LogoutView(APIView):
         response = JsonResponse({"message": "Logged out"})
         response.delete_cookie("access_token", path="/", samesite="Lax")
         response.delete_cookie("refresh_token", path="/", samesite="Lax")
+        response.delete_cookie("csrftoken", path="/", samesite="Lax")
         return response
