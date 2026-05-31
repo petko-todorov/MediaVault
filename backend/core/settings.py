@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     "rest_framework",
 
     "accounts",
+    "search",
+    "media",
+    "games",
 ]
 
 MIDDLEWARE = [
