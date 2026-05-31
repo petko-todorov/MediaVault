@@ -7,7 +7,8 @@
         "build": "next build",
         "start": "next start",
         "lint": "eslint",
-        "windows": "concurrently --raw \"cd ../backend && .\\.venv\\Scripts\\activate && python manage.py runserver\" \"cd ../frontend && npm i && npm run dev\""
+        "windows": "concurrently --raw \"cd ../backend && .\\.venv\\Scripts\\activate && python manage.py runserver\" \"cd ../frontend && npm i && npm run dev\"",
+        "linux": "concurrently --raw \"cd ../backend && . .venv_linux/bin/activate && python manage.py runserver\" \"cd ../frontend && npm install && npm run dev\""
     },
     "dependencies": {
         "@react-oauth/google": "^0.13.5",
