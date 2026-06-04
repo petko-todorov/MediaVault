@@ -55,7 +55,7 @@ export default function SideNavBar() {
                             href={link.href}
                             className={`flex justify-start items-center space-x-3 rounded-xl px-4 py-3 transition-colors ${
                                 isActive
-                                    ? 'bg-slate-700 text-white'
+                                    ? 'bg-slate-700 text-white border-r-2 border-slate-300'
                                     : 'hover:bg-slate-800 text-gray-300'
                             }`}
                         >
