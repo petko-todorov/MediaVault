@@ -32,7 +32,14 @@ class MoviesSeriesSearchView(APIView):
                 tmdb_id__in=cache_entry.results_ids)
             results_dict = {obj.tmdb_id: obj for obj in results}
             ordered_results = [results_dict[tid]
-                               for tid in cache_entry.results_ids if tid in results_dict]
+                               for tid in cache_entry.results_ids if tid in results_dict][:10]
+
+            ordered_results = sorted(
+                ordered_results,
+                key=lambda x: x.rating if x.rating is not None else 0,
+                reverse=True
+            )
+
             serializer = MovieSeriesSerializer(ordered_results, many=True)
             return Response(serializer.data)
 
@@ -78,10 +85,13 @@ class MoviesSeriesSearchView(APIView):
         for item in valid_items:
             tmdb_id = item.get('id')
             media_type = item.get('media_type')
+            if media_type == 'tv':
+                media_type = 'series'
             title = item.get('title') or item.get('name')
             release_date = item.get('release_date') or item.get(
                 'first_air_date') or ""
             poster_path = item.get('poster_path')
+            tmdb_url = f"https://www.themoviedb.org/{media_type}/{tmdb_id}"
 
             defaults = {
                 'title': title,
@@ -90,7 +100,8 @@ class MoviesSeriesSearchView(APIView):
                 'rating': item.get('vote_average'),
                 'media_type': media_type,
                 'release_year': release_date[:4] if release_date else None,
-                'last_fetched': now
+                'last_fetched': now,
+                'tmdb_url': tmdb_url
             }
 
             if tmdb_id in existing_objs:
@@ -110,7 +121,7 @@ class MoviesSeriesSearchView(APIView):
             MovieSeries.objects.bulk_update(
                 to_update,
                 ['title', 'description', 'poster', 'rating',
-                 'media_type', 'release_year', 'last_fetched']
+                 'media_type', 'release_year', 'last_fetched', 'tmdb_url']
             )
 
         SearchCache.objects.update_or_create(
@@ -123,7 +134,14 @@ class MoviesSeriesSearchView(APIView):
         )
 
         ordered_results = [final_results_dict[tid]
-                           for tid in tmdb_ids if tid in final_results_dict]
+                           for tid in tmdb_ids if tid in final_results_dict][:10]
+
+        ordered_results = sorted(
+            ordered_results,
+            key=lambda x: x.rating if x.rating is not None else 0,
+            reverse=True
+        )
+
         serializer = MovieSeriesSerializer(ordered_results, many=True)
         return Response(serializer.data)
 
@@ -145,7 +163,14 @@ class GameSearchView(APIView):
             results = Game.objects.filter(rawg_id__in=cache_entry.results_ids)
             results_dict = {obj.rawg_id: obj for obj in results}
             ordered_results = [results_dict[rid]
-                               for rid in cache_entry.results_ids if rid in results_dict]
+                               for rid in cache_entry.results_ids if rid in results_dict][:10]
+
+            ordered_results = sorted(
+                ordered_results,
+                key=lambda x: x.rating if x.rating is not None else 0,
+                reverse=True
+            )
+
             serializer = GameSerializer(ordered_results, many=True)
             return Response(serializer.data)
 
@@ -199,7 +224,7 @@ class GameSearchView(APIView):
                 'title': item.get('name'),
                 'poster': item.get('background_image'),
                 'rating': rating if rating else None,
-                'release_year': release_date if release_date else None,
+                'release_year': release_date[:4] if release_date else None,
                 'tags': top_3_tag_names
             }
 
@@ -230,7 +255,7 @@ class GameSearchView(APIView):
         )
 
         ordered_results = [final_results_dict[rid]
-                           for rid in rawg_ids if rid in final_results_dict]
+                           for rid in rawg_ids if rid in final_results_dict][:10]
 
         ordered_results = sorted(
             ordered_results,
