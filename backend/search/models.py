@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class SearchCache(models.Model):
     CATEGORIES = {
         'movie_tv': 'Movies and TV Series',
