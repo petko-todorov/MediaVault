@@ -15,12 +15,10 @@ export default function SearchMoviesSeriesResults({ movies, loading }) {
 
     return (
         <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
-                {movies.map((movie) => (
-                    <div
-                        key={movie.id}
-                        className="relative group overflow-hidden rounded-xl h-64 flex flex-col justify-end px-3 py-2 text-white shadow-lg"
-                    >
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full">
+            {movies.map((movie) => (
+                <li key={movie.id}>
+                    <article className="relative group overflow-hidden rounded-xl h-64 flex flex-col justify-end px-3 py-2 text-white shadow-lg">
                         <img
                             src={movie.poster}
                             alt={movie.title}
@@ -35,7 +33,7 @@ export default function SearchMoviesSeriesResults({ movies, loading }) {
                             </span>
                             <h3 className="line-clamp-1">{movie.title}</h3>
                             <div className="text-sm">
-                                <span>{movie.release_year}</span>
+                                <time dateTime={movie.release_year}>{movie.release_year}</time>
                                 {movie.rating !== 0 && (
                                     <span className="pl-1">
                                         ●⭐{movie.rating.toFixed(1)}
@@ -57,11 +55,12 @@ export default function SearchMoviesSeriesResults({ movies, loading }) {
                                     <span>TMDB</span>
                                 </Link>
                             )}
-                            <AddToLibrary />
+                            <AddToLibrary item={movie} />
                         </div>
-                    </div>
-                ))}
-            </div>
+                    </article>
+                </li>
+            ))}
+        </ul>
         </>
     );
 }
