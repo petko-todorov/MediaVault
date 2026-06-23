@@ -33,13 +33,13 @@ export default function RootLayout({ children }) {
                         clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
                     >
                         <AuthGate>
-                            <div className="flex h-screen w-screen overflow-hidden scrollbar-thumb-sky-900">
+                            <div className="flex h-screen w-screen overflow-hidden scrollbar-thumb-sky-950">
                                 <SideNavBar />
 
                                 <div className="flex-1 h-full overflow-y-auto relative">
                                     <Header />
 
-                                    <main className="p-6">{children}</main>
+                                    <main className="px-6">{children}</main>
                                 </div>
                             </div>
                         </AuthGate>
