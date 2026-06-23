@@ -22,18 +22,7 @@ export async function loginWithGoogle(code) {
 export async function logout() {
     try {
         await axios.post('/api/auth/logout');
-
-        await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout/`,
-            {},
-            {
-                withCredentials: true,
-            },
-        );
     } catch (error) {
-        console.error(
-            'Logout failed:',
-            error.response?.data || error.message,
-        );
+        console.error('Logout failed:', error.response?.data || error.message);
     }
 }
