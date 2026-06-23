@@ -113,14 +113,15 @@ class UserMeView(RetrieveAPIView):
 
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def post(self, request):
+        print(request.COOKIES)
         refresh_token = request.COOKIES.get("refresh_token")
         if refresh_token:
             try:
                 token = RefreshToken(refresh_token)
-                token.blacklist()
+                # token.blacklist()
             except TokenError:
                 pass
 
