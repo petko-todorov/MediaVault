@@ -1,6 +1,7 @@
-from django.utils import timezone
-from django.db import models
 from django.conf import settings
+from django.db import models
+from django.utils import timezone
+
 
 class MovieSeries(models.Model):
     TYPES = {
@@ -15,9 +16,11 @@ class MovieSeries(models.Model):
     media_type = models.CharField(max_length=10, choices=TYPES)
     release_year = models.CharField(max_length=10, null=True, blank=True)
     last_fetched = models.DateTimeField(default=timezone.now)
+    tmdb_url = models.URLField(max_length=500, null=True, blank=True)
 
     def __str__(self):
         return f"{self.title}"
+
 
 class UserMediaLibrary(models.Model):
     STATUS_CHOICES = {
