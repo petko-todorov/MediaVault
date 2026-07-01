@@ -21,7 +21,7 @@ export default function SearchGameResults({ games, loading }) {
                         />
                         <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
                         <div className="relative z-10">
-                            <span className="capitalize px-2 py-1 rounded-md text-sm text-amber-300 bg-orange-800/40">
+                            <span className="capitalize px-2 py-1 rounded-md text-sm bg-orange-800/60 text-amber-300">
                                 game
                             </span>
                             <h3 className="line-clamp-1">{game.title}</h3>
