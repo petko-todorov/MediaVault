@@ -10,8 +10,8 @@ const addToLibrary = async ({ item, mediaType }) => {
         : '/api/media/moviesSeries/add';
     const payload = isGame ? { game: item.id } : { media_item: item.id };
 
-    await axios.post(endpoint, payload);
-    return item;
+    const res = await axios.post(endpoint, payload);
+    return res.data;
 };
 
 export function useAddToLibrary() {
@@ -20,10 +20,23 @@ export function useAddToLibrary() {
 
     return useMutation({
         mutationFn: addToLibrary,
-        onSuccess: (newItem) => {
+        onSuccess: async (newItem) => {
             queryClient.setQueryData(libraryKeys.all, (oldData) => {
-                return oldData ? [newItem, ...oldData] : [newItem];
+                const itemType = newItem.game ? 'game' : 'media';
+                const withoutDuplicate = oldData
+                    ? oldData.filter((item) => {
+                          const currentType = item.game ? 'game' : 'media';
+                          return !(
+                              currentType === itemType && item.id === newItem.id
+                          );
+                      })
+                    : [];
+
+                return [newItem, ...withoutDuplicate].sort(
+                    (a, b) => new Date(b.added_at) - new Date(a.added_at),
+                );
             });
+            await queryClient.invalidateQueries({ queryKey: libraryKeys.all });
             router.push('/library');
         },
         onError: (error) => {
