@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -7,12 +7,17 @@ from games.models import UserGameLibrary
 from games.serializers import UserGameLibrarySerializer
 
 
-class CreateGameView(ListCreateAPIView):
+class GameLibraryView(ListAPIView):
     serializer_class = UserGameLibrarySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return UserGameLibrary.objects.filter(user=self.request.user).select_related('game')
+
+
+class CreateGameView(CreateAPIView):
+    serializer_class = UserGameLibrarySerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
