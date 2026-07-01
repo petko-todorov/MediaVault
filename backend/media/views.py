@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -7,12 +7,17 @@ from media.models import UserMediaLibrary
 from media.serializers import UserMediaLibrarySerializer
 
 
-class CreateMediaView(ListCreateAPIView):
+class MediaLibraryView(ListAPIView):
     serializer_class = UserMediaLibrarySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return UserMediaLibrary.objects.filter(user=self.request.user).select_related('media_item')
+
+
+class CreateMediaView(CreateAPIView):
+    serializer_class = UserMediaLibrarySerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
