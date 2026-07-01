@@ -13,7 +13,6 @@ export default function SearchResultPage({ searchParams }) {
     const { data: movies = [], isLoading: loadingMovies } =
         useSearchMoviesSeries(q);
     const { data: games = [], isLoading: loadingGames } = useSearchGames(q);
-    console.log('games', games);
 
     return (
         <section className="p-2 text-white">
