@@ -1,43 +1,78 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { libraryKeys } from '@/lib/queryKeys';
-
-const fetchLibrary = async () => {
-    const res = await axios.get('/api/media/moviesSeries');
-    return res.data;
-};
+import { useLibrary } from '@/hooks/useLibrary';
+import LibraryItemCard from '@/components/library/LibraryItemCard';
+import { useState } from 'react';
+import ActiveTypeButton from '@/components/library/ActiveTypeButton';
 
 export default function LibraryPage() {
-    const {
-        data: libraryItems,
-        isLoading,
-        error,
-    } = useQuery({
-        queryKey: libraryKeys.all,
-        queryFn: fetchLibrary,
-    });
+    const { data: libraryItems, isLoading, error } = useLibrary();
+    const [activeType, setActiveType] = useState('all');
 
-    console.log(libraryItems);
-
-    if (isLoading)
+    if (isLoading) {
         return (
             <div className="p-8 text-center text-gray-400">
                 Loading your library...
             </div>
         );
+    }
 
-    if (error)
+    if (error) {
         return (
             <div className="p-8 text-center text-red-500">
                 Error loading library.
             </div>
         );
+    }
+
+    const filteredItems = libraryItems.filter((item) => {
+        if (activeType === 'all') return true;
+
+        if (activeType === 'games') {
+            return Boolean(item.game);
+        }
+
+        if (activeType === 'movies') {
+            return item.media_item?.media_type === 'movie';
+        }
+
+        if (activeType === 'tv') {
+            return item.media_item?.media_type === 'series';
+        }
+
+        return true;
+    });
 
     return (
         <section className="p-4 sm:p-8">
             <h1 className="text-3xl font-bold mb-8 text-white">My Library</h1>
+
+            <div className="flex flex-wrap gap-4 mb-8">
+                <ActiveTypeButton
+                    activeType={activeType}
+                    setActiveType={setActiveType}
+                    buttonText="All"
+                    type="all"
+                />
+                <ActiveTypeButton
+                    activeType={activeType}
+                    setActiveType={setActiveType}
+                    buttonText="Movies"
+                    type="movies"
+                />
+                <ActiveTypeButton
+                    activeType={activeType}
+                    setActiveType={setActiveType}
+                    buttonText="TV Series"
+                    type="tv"
+                />
+                <ActiveTypeButton
+                    activeType={activeType}
+                    setActiveType={setActiveType}
+                    buttonText="Games"
+                    type="games"
+                />
+            </div>
 
             {!libraryItems || libraryItems.length === 0 ? (
                 <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
@@ -47,10 +82,19 @@ export default function LibraryPage() {
                     </p>
                 </div>
             ) : (
-                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {libraryItems.map((item, index) => (
-                        <div key={index}></div>
-                    ))}
+                <ul className="grid grid-cols-3 gap-6">
+                    {filteredItems.map((libraryItem) => {
+                        const type = libraryItem.game
+                            ? 'game'
+                            : libraryItem.media_item?.media_type || 'media';
+
+                        return (
+                            <LibraryItemCard
+                                key={`${type}-${libraryItem.id}`}
+                                libraryItem={libraryItem}
+                            />
+                        );
+                    })}
                 </ul>
             )}
         </section>
