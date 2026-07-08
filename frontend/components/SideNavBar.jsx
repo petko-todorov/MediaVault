@@ -47,7 +47,9 @@ export default function SideNavBar() {
             />
             <nav className="flex-1 flex flex-col gap-3 w-full">
                 {LINKS.map((link, index) => {
-                    const isActive = link.href === pathname;
+                    const isActive =
+                        pathname === link.href ||
+                        pathname.startsWith(`${link.href}/`);
 
                     return (
                         <Link
