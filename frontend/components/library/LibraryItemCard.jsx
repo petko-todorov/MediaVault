@@ -10,14 +10,14 @@ export default function LibraryItemCard({ libraryItem }) {
     const label =
         type === 'game'
             ? 'Game'
-            : type === 'series'
+            : ['tv', 'series'].includes(type)
               ? 'TV Series'
               : 'Movie';
 
     const badgeClass =
         type === 'game'
             ? 'bg-orange-800/60 text-amber-300'
-            : type === 'series'
+            : ['tv', 'series'].includes(type)
               ? 'bg-violet-600/80 text-purple-100'
               : 'bg-sky-500/80 text-blue-100';
 
