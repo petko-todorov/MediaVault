@@ -11,6 +11,7 @@
         "linux": "concurrently --raw \"cd ../backend && . .venv_linux/bin/activate && python manage.py runserver\" \"cd ../frontend && npm install && npm run dev\""
     },
     "dependencies": {
+        "@dnd-kit/react": "^0.5.0",
         "@react-oauth/google": "^0.13.5",
         "@tanstack/react-query": "^5.100.10",
         "axios": "^1.16.1",
