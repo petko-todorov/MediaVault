@@ -1,5 +1,5 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -33,3 +33,12 @@ class CreateMediaView(CreateAPIView):
             self.get_serializer(instance).data,
             status=status_code
         )
+
+
+class UpdateMediaView(UpdateAPIView):
+    serializer_class = UserMediaLibrarySerializer
+    permission_classes = [IsAuthenticated]
+    http_method_names = ['patch']
+
+    def get_queryset(self):
+        return UserMediaLibrary.objects.filter(user=self.request.user).select_related('media_item')
