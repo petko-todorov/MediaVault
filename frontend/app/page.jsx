@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 export default function Home() {
     const user = useStore((state) => state.user);
     const clearUser = useStore((state) => state.clearUser);
-    console.log(user);
     const router = useRouter();
 
     const handleLogout = async () => {

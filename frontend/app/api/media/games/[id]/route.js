@@ -6,7 +6,6 @@ export const PATCH = requireAuth(async (request, { accessToken, params }) => {
     try {
         const body = await request.json();
         const { id } = await params;
-        console.log('id', id);
 
         const res = await axios.patch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/update-game/${id}/`,
