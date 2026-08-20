@@ -1,6 +1,6 @@
 import LibraryItemCard from '@/components/library/LibraryItemCard';
 
-export default function LibraryGrid({ items, emptyMessage }) {
+export default function LibraryGrid({ items, emptyMessage, disableDrag = false }) {
     if (!items || items.length === 0) {
         return (
             <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
@@ -20,6 +20,7 @@ export default function LibraryGrid({ items, emptyMessage }) {
                     <LibraryItemCard
                         key={`${type}-${libraryItem.id}`}
                         libraryItem={libraryItem}
+                        disableDrag={disableDrag}
                     />
                 );
             })}

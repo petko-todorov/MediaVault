@@ -32,6 +32,7 @@ function getLibraryItemKey(item) {
 export default function LibraryStatusSections({
     items,
     emptyLabel = 'movies',
+    disableDrag = false,
 }) {
     const [pageByStatus, setPageByStatus] = useState({});
     const [statusOverrides, setStatusOverrides] = useState({});
@@ -113,96 +114,122 @@ export default function LibraryStatusSections({
         );
     }
 
+    const sectionsContent = (
+        <div className="grid grid-cols-1 gap-6">
+            {statusSections.map((status) => {
+                const statusItems = localItems.filter(
+                    (item) => item.status === status.key,
+                );
+
+                const currentPage = pageByStatus[status.key] ?? 0;
+
+                const offset = currentPage * ITEMS_PER_PAGE;
+
+                const currentItems = statusItems.slice(
+                    offset,
+                    offset + ITEMS_PER_PAGE,
+                );
+
+                const pageCount = Math.ceil(
+                    statusItems.length / ITEMS_PER_PAGE,
+                );
+
+                const statusContent = (
+                    <>
+                        <div className="mb-4 flex items-center justify-between gap-3">
+                            <h2 className="text-lg font-semibold text-white">
+                                {status.label}
+                            </h2>
+
+                            <span className="rounded-full bg-black/30 px-3 py-1 text-sm text-gray-300">
+                                {statusItems.length}
+                            </span>
+                        </div>
+
+                        {statusItems.length === 0 ? (
+                            <p className="rounded-lg border border-dashed border-white/10 px-3 py-8 text-center text-sm text-gray-500">
+                                No items
+                            </p>
+                        ) : (
+                            <div>
+                                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                                    {currentItems.map((libraryItem) => (
+                                        <li
+                                            key={`library-${libraryItem.game ? 'game' : 'media'}-${libraryItem.id}`}
+                                            className="min-w-0"
+                                        >
+                                            <LibraryItemCard
+                                                libraryItem={libraryItem}
+                                                disableDrag={disableDrag}
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                {pageCount > 1 && (
+                                    <ReactPaginate
+                                        breakLabel="..."
+                                        nextLabel=">"
+                                        previousLabel="<"
+                                        pageRangeDisplayed={3}
+                                        marginPagesDisplayed={1}
+                                        pageCount={pageCount}
+                                        forcePage={currentPage}
+                                        onPageChange={(event) =>
+                                            setPageByStatus((prev) => ({
+                                                ...prev,
+                                                [status.key]:
+                                                    event.selected,
+                                            }))
+                                        }
+                                        containerClassName="flex justify-center items-center gap-2 mt-6"
+                                        pageClassName="rounded bg-white/10 cursor-pointer select-none"
+                                        pageLinkClassName="flex h-10 w-10 items-center justify-center text-white"
+                                        activeClassName="bg-white/30"
+                                        previousClassName="rounded bg-white/10 select-none"
+                                        previousLinkClassName="flex h-10 w-10 items-center justify-center text-white cursor-pointer"
+                                        nextClassName="rounded bg-white/10 select-none"
+                                        nextLinkClassName="flex h-10 w-10 items-center justify-center text-white cursor-pointer"
+                                        disabledClassName="opacity-50"
+                                    />
+                                )}
+                            </div>
+                        )}
+                    </>
+                );
+
+                if (disableDrag) {
+                    return (
+                        <div
+                            key={status.key}
+                            className="min-h-44 rounded-xl border border-white/10 bg-white/5 p-4"
+                        >
+                            {statusContent}
+                        </div>
+                    );
+                }
+
+                return (
+                    <Droppable
+                        key={status.key}
+                        id={`status-${status.key}`}
+                        data={{ status: status.key }}
+                        className="min-h-44 rounded-xl border border-white/10 bg-white/5 p-4 transition-shadow"
+                    >
+                        {statusContent}
+                    </Droppable>
+                );
+            })}
+        </div>
+    );
+
+    if (disableDrag) {
+        return sectionsContent;
+    }
+
     return (
         <DragDropProvider onDragEnd={handleDragEnd}>
-            <div className="grid grid-cols-1 gap-6">
-                {statusSections.map((status) => {
-                    const statusItems = localItems.filter(
-                        (item) => item.status === status.key,
-                    );
-
-                    const currentPage = pageByStatus[status.key] ?? 0;
-
-                    const offset = currentPage * ITEMS_PER_PAGE;
-
-                    const currentItems = statusItems.slice(
-                        offset,
-                        offset + ITEMS_PER_PAGE,
-                    );
-
-                    const pageCount = Math.ceil(
-                        statusItems.length / ITEMS_PER_PAGE,
-                    );
-
-                    return (
-                        <Droppable
-                            key={status.key}
-                            id={`status-${status.key}`}
-                            data={{ status: status.key }}
-                            className="min-h-44 rounded-xl border border-white/10 bg-white/5 p-4 transition-shadow"
-                        >
-                            <div className="mb-4 flex items-center justify-between gap-3">
-                                <h2 className="text-lg font-semibold text-white">
-                                    {status.label}
-                                </h2>
-
-                                <span className="rounded-full bg-black/30 px-3 py-1 text-sm text-gray-300">
-                                    {statusItems.length}
-                                </span>
-                            </div>
-
-                            {statusItems.length === 0 ? (
-                                <p className="rounded-lg border border-dashed border-white/10 px-3 py-8 text-center text-sm text-gray-500">
-                                    No items
-                                </p>
-                            ) : (
-                                <div>
-                                    <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                                        {currentItems.map((libraryItem) => (
-                                            <li
-                                                key={`library-${libraryItem.game ? 'game' : 'media'}-${libraryItem.id}`}
-                                                className="min-w-0"
-                                            >
-                                                <LibraryItemCard
-                                                    libraryItem={libraryItem}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ul>
-
-                                    {pageCount > 1 && (
-                                        <ReactPaginate
-                                            breakLabel="..."
-                                            nextLabel=">"
-                                            previousLabel="<"
-                                            pageRangeDisplayed={3}
-                                            marginPagesDisplayed={1}
-                                            pageCount={pageCount}
-                                            forcePage={currentPage}
-                                            onPageChange={(event) =>
-                                                setPageByStatus((prev) => ({
-                                                    ...prev,
-                                                    [status.key]:
-                                                        event.selected,
-                                                }))
-                                            }
-                                            containerClassName="flex justify-center items-center gap-2 mt-6"
-                                            pageClassName="rounded bg-white/10 cursor-pointer select-none"
-                                            pageLinkClassName="flex h-10 w-10 items-center justify-center text-white"
-                                            activeClassName="bg-white/30"
-                                            previousClassName="rounded bg-white/10 select-none"
-                                            previousLinkClassName="flex h-10 w-10 items-center justify-center text-white cursor-pointer"
-                                            nextClassName="rounded bg-white/10 select-none"
-                                            nextLinkClassName="flex h-10 w-10 items-center justify-center text-white cursor-pointer"
-                                            disabledClassName="opacity-50"
-                                        />
-                                    )}
-                                </div>
-                            )}
-                        </Droppable>
-                    );
-                })}
-            </div>
+            {sectionsContent}
         </DragDropProvider>
     );
 }

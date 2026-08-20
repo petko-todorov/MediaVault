@@ -60,6 +60,7 @@ export default function LibraryPageContent({
             <LibraryStatusSections
                 items={filteredItems}
                 emptyLabel={type === 'tv' ? 'TV series' : type}
+                disableDrag={type === 'all'}
             />
         );
     }
@@ -68,6 +69,7 @@ export default function LibraryPageContent({
         <LibraryGrid
             items={filteredItems}
             emptyMessage={EMPTY_MESSAGES[type] || EMPTY_MESSAGES.all}
+            disableDrag={type === 'all'}
         />
     );
 }
