@@ -5,6 +5,7 @@ import { QueryProvider } from '@/providers/queryProvider';
 import AuthGate from '@/components/AuthGate';
 import SideNavBar from '@/components/SideNavBar';
 import Header from '@/components/Header';
+import MainContent from '@/components/MainContent';
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -39,7 +40,7 @@ export default function RootLayout({ children }) {
                                 <div className="flex-1 h-full overflow-y-auto relative">
                                     <Header />
 
-                                    <main className="px-6">{children}</main>
+                                    <MainContent>{children}</MainContent>
                                 </div>
                             </div>
                         </AuthGate>
