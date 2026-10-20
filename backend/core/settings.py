@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "search",
     "media",
     "games",
+    "activities",
 ]
 
 MIDDLEWARE = [
