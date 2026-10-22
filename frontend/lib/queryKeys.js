@@ -11,3 +11,9 @@ export const gamesKeys = {
 export const libraryKeys = {
     all: ['library'],
 };
+
+export const activityKeys = {
+    all: ['activities'],
+    list: (params) => [...activityKeys.all, params],
+};
+
