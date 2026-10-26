@@ -1,6 +1,8 @@
 import Droppable from '@/components/draganddrop/Droppable';
 import LibraryItemCard from '@/components/library/LibraryItemCard';
 import { DragDropProvider } from '@dnd-kit/react';
+import { useQueryClient } from '@tanstack/react-query';
+import { activityKeys, libraryKeys } from '@/lib/queryKeys';
 import axios from 'axios';
 import { useState } from 'react';
 import ReactPaginate from 'react-paginate';
@@ -34,6 +36,7 @@ export default function LibraryStatusSections({
     emptyLabel = 'movies',
     disableDrag = false,
 }) {
+    const queryClient = useQueryClient();
     const [pageByStatus, setPageByStatus] = useState({});
     const [statusOverrides, setStatusOverrides] = useState({});
     const statusSections =
@@ -90,6 +93,9 @@ export default function LibraryStatusSections({
                 ...currentOverrides,
                 [itemKey]: response.data.status,
             }));
+
+            queryClient.invalidateQueries({ queryKey: activityKeys.all });
+            queryClient.invalidateQueries({ queryKey: libraryKeys.all });
         } catch (error) {
             setStatusOverrides((currentOverrides) => ({
                 ...currentOverrides,
