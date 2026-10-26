@@ -18,11 +18,11 @@ const LINKS = [
         href: '/library',
         icon: <MdVideoLibrary className="text-indigo-200" size={25} />,
     },
-    {
-        name: 'test',
-        href: '#',
-        icon: <MdHomeFilled className="text-blue-200" />,
-    },
+    // {
+    //     name: 'test',
+    //     href: '#',
+    //     icon: <MdHomeFilled className="text-blue-200" size={25} />,
+    // },
 ];
 
 export default function SideNavBar() {
