@@ -1,4 +1,4 @@
-import { libraryKeys } from '@/lib/queryKeys';
+import { activityKeys, libraryKeys } from '@/lib/queryKeys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -37,6 +37,7 @@ export function useAddToLibrary() {
                 );
             });
             await queryClient.invalidateQueries({ queryKey: libraryKeys.all });
+            await queryClient.invalidateQueries({ queryKey: activityKeys.all });
             router.push('/library');
         },
         onError: (error) => {
