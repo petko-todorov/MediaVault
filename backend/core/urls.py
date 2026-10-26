@@ -24,5 +24,6 @@ urlpatterns = [
         path('', include("search.urls")),
         path('', include("media.urls")),
         path('', include("games.urls")),
+        path('', include("activities.urls")),
     ])),
 ]
