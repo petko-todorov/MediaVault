@@ -3,6 +3,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from activities.models import Activity
 from media.models import UserMediaLibrary
 from media.serializers import UserMediaLibrarySerializer
 
@@ -28,6 +29,15 @@ class CreateMediaView(CreateAPIView):
             media_item=serializer.validated_data['media_item'],
         )
 
+        if created:
+            Activity.objects.create(
+                user=self.request.user,
+                activity_type='added',
+                media_type=instance.media_item.media_type,
+                media_item=instance.media_item,
+                to_status=instance.status,
+            )
+
         status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         return Response(
             self.get_serializer(instance).data,
@@ -42,3 +52,19 @@ class UpdateMediaView(UpdateAPIView):
 
     def get_queryset(self):
         return UserMediaLibrary.objects.filter(user=self.request.user).select_related('media_item')
+
+    def perform_update(self, serializer):
+        old_status = serializer.instance.status
+        instance = serializer.save()
+        new_status = instance.status
+
+        if old_status != new_status:
+            Activity.objects.create(
+                user=self.request.user,
+                activity_type='status_change',
+                media_type=instance.media_item.media_type,
+                media_item=instance.media_item,
+                from_status=old_status,
+                to_status=new_status,
+            )
+
